@@ -3,17 +3,8 @@
 require 'rspec'
 
 RSpec.describe 'UkkonenSuffixTree' do
-  before do
-    # Do nothing
-  end
-
-  after do
-    # Do nothing
-  end
-
-  context 'when condition' do
-    it 'succeeds' do
-      pending 'Not implemented'
-    end
+  it 'checks for a full match' do
+    expect(ElephantInTheRoom::UkkonenSuffixTree.from("text").contains("text")).to be true
+    expect(ElephantInTheRoom::UkkonenSuffixTree.from("text").contains("word")).to be false
   end
 end
