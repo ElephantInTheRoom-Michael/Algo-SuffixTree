@@ -1,8 +1,15 @@
-AllCops:
-  TargetRubyVersion: 3.2
+# Omakase Ruby styling for Rails
+inherit_gem: { rubocop-rails-omakase: rubocop.yml }
 
-Style/StringLiterals:
-  EnforcedStyle: double_quotes
+# Overwrite or add rules to create your own house style
 
-Style/StringLiteralsInInterpolation:
-  EnforcedStyle: double_quotes
+Layout/ClosingParenthesisIndentation:
+  Enabled: true
+
+Style/TrailingCommaInHashLiteral:
+  Enabled: true
+  EnforcedStyleForMultiline: consistent_comma
+
+Style/TrailingCommaInArrayLiteral:
+  Enabled: true
+  EnforcedStyleForMultiline: consistent_comma
