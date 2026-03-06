@@ -70,7 +70,17 @@ module ElephantInTheRoom
         @letters << letter
 
         @remainder += 1
+        process_remainder
+      end
 
+      def process_remainder
+        continue = true
+        while @remainder > 0 && continue
+          continue = step
+        end
+      end
+
+      def step
         if @active_edge
           if letter == @letters[@active_edge.start + @active_length]
             @active_length += 1
@@ -84,6 +94,8 @@ module ElephantInTheRoom
           @active_node.add_edge(letter, @letters.length - 1)
           @remainder = 0
         end
+        
+        false
       end
 
       def split_active_edge(inner_node)
