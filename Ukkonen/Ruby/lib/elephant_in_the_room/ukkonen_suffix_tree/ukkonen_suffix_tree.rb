@@ -11,7 +11,11 @@ module ElephantInTheRoom
         end
 
         def add_edge(letter, start)
-          @edges[letter] = Edge.new(start)
+          @edges[letter] = Edge.new(start, self, letter)
+        end
+
+        def add_inner_edge(letter, inner_edge)
+          @edges[letter] = inner_edge
         end
       end
 
@@ -20,8 +24,28 @@ module ElephantInTheRoom
       class Edge
         attr_reader :start
 
-        def initialize(start)
+        def initialize(start, start_node, start_letter)
           @start = start
+          @start_node = start_node
+          @start_letter = start_letter
+        end
+
+        def split(length, at_letter, inner_node = Node.new)
+          left = left_split(length)
+          right = right_split(length, inner_node, at_letter)
+          @start_node.add_inner_edge(@start_letter, left)
+          inner_node.add_edge(at_letter, right)
+          [ left, right ]
+        end
+
+        private
+
+        def left_split(length)
+          InnerEdge.new(@start, @start_node, @start_letter, @start + length, @start_node)
+        end
+
+        def right_split(length, inner_node, at_letter)
+          Edge.new(@start + length, inner_node, at_letter)
         end
       end
 
@@ -29,10 +53,16 @@ module ElephantInTheRoom
         attr_reader :to
         attr_reader :node
 
-        def initialize(start, to, node)
-          super(start)
+        def initialize(start, start_node, start_letter, to, node)
+          super(start, start_node, start_letter)
           @to = to
           @node = node
+        end
+
+        private
+
+        def right_split(length, inner_node, at_letter)
+          InnerEdge.new(@start + length, @to, @node)
         end
       end
 
@@ -51,8 +81,12 @@ module ElephantInTheRoom
       end
 
       def finalize
-        if @remainder > 0
-          split_active_edge(EndNode.new)
+        if @active_length > 0
+          @active_edge.split(
+            @active_length,
+            @letters[@active_edge.start + @active_length],
+            EndNode.new,
+          )
         end
       end
 
@@ -76,11 +110,12 @@ module ElephantInTheRoom
       def process_remainder
         continue = true
         while @remainder > 0 && continue
-          continue = step
+          start_letter = @letters[-@remainder]
+          continue = step(start_letter)
         end
       end
 
-      def step
+      def step(letter)
         if @active_edge
           if letter == @letters[@active_edge.start + @active_length]
             @active_length += 1
@@ -94,15 +129,8 @@ module ElephantInTheRoom
           @active_node.add_edge(letter, @letters.length - 1)
           @remainder = 0
         end
-        
-        false
-      end
 
-      def split_active_edge(inner_node)
-        right_edge = Edge.new(@active_edge.start + @active_length)
-        left_edge = InnerEdge.new(@active_edge.start, right_edge.start, inner_node)
-        @active_node.edges[@letters[left_edge.start]] = left_edge
-        inner_node.edges[@letters[right_edge.start]] = right_edge
+        false
       end
 
       def search(text, node, must_be_suffix)
