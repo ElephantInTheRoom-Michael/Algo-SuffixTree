@@ -20,23 +20,26 @@ module ElephantInTheRoom
         text.each_char { add_letter(_1) }
       end
 
-      def finalize
-        if @active_length > 0
-          @active_edge.split(
-            @active_length,
-            @letters[@active_edge.start + @active_length],
-            EndNode.new,
-          )
-        end
-      end
+      # def finalize
+      #   # TODO This needs to be a while loop decrementing remainder each time until it reaches 0
+      #   if @active_length > 0
+      #     @active_edge.split(
+      #       @active_length,
+      #       @letters[@active_edge.start + @active_length],
+      #       EndNode.new,
+      #     )
+      #   # else
+      #   #   @active_node.to_end_node
+      #   end
+      # end
 
       def contains?(text)
         search(text, @root, false)
       end
 
-      def ends_with?(text)
-        search(text, @root, true)
-      end
+      # def ends_with?(text)
+      #   search(text, @root, true)
+      # end
 
       private
 
