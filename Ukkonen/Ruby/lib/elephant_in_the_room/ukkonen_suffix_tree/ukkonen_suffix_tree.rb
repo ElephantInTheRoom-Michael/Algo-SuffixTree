@@ -1,71 +1,11 @@
 # frozen_string_literal: true
 
+require_relative 'edge'
+require_relative 'node'
+
 module ElephantInTheRoom
   module UkkonenSuffixTree
     class UkkonenSuffixTree
-      class Node
-        attr_reader :edges
-
-        def initialize
-          @edges = {}
-        end
-
-        def add_edge(letter, start)
-          @edges[letter] = Edge.new(start, self, letter)
-        end
-
-        def add_inner_edge(letter, inner_edge)
-          @edges[letter] = inner_edge
-        end
-      end
-
-      class EndNode < Node; end
-
-      class Edge
-        attr_reader :start
-
-        def initialize(start, start_node, start_letter)
-          @start = start
-          @start_node = start_node
-          @start_letter = start_letter
-        end
-
-        def split(length, at_letter, inner_node = Node.new)
-          left = left_split(length)
-          right = right_split(length, inner_node, at_letter)
-          @start_node.add_inner_edge(@start_letter, left)
-          inner_node.add_edge(at_letter, right)
-          [ left, right ]
-        end
-
-        private
-
-        def left_split(length)
-          InnerEdge.new(@start, @start_node, @start_letter, @start + length, @start_node)
-        end
-
-        def right_split(length, inner_node, at_letter)
-          Edge.new(@start + length, inner_node, at_letter)
-        end
-      end
-
-      class InnerEdge < Edge
-        attr_reader :to
-        attr_reader :node
-
-        def initialize(start, start_node, start_letter, to, node)
-          super(start, start_node, start_letter)
-          @to = to
-          @node = node
-        end
-
-        private
-
-        def right_split(length, inner_node, at_letter)
-          InnerEdge.new(@start + length, @to, @node)
-        end
-      end
-
       def initialize
         @letters = []
 
