@@ -25,7 +25,9 @@ module ElephantInTheRoom
 
         lines.append("") if lines.empty?
         lines.each.with_index do |line, line_number|
-          prefix = if line_number == 0
+          prefix = if line_number == 0 && self.is_a?(EndNode)
+                     "[]"
+                   elsif line_number == 0
                      "()"
                    elsif line_number == lines.length - 1
                      " \\"

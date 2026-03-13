@@ -27,26 +27,35 @@ module ElephantInTheRoom
         puts self
       end
 
-      # def finalize
-      #   # TODO This needs to be a while loop decrementing remainder each time until it reaches 0
-      #   if @active_length > 0
-      #     @active_edge.split(
-      #       @active_length,
-      #       @letters[@active_edge.start + @active_length],
-      #       EndNode.new,
-      #     )
-      #   # else
-      #   #   @active_node.to_end_node
-      #   end
-      # end
+      def finalize
+        puts "Finalize"
+
+        while @remainder > 0
+          puts "Remainder #{@remainder}"
+          if @active_length > 0
+            puts "On active edge #{@active_edge} at length #{@active_length}"
+            inner_node = @active_edge.split(@active_length)
+            inner_node.replace_with_end_node
+          else
+            puts "On active node #{@active_node}"
+            @active_node.replace_with_end_node
+          end
+
+          @remainder -= 1
+          reset_active_point
+          rescan if @remainder > 0
+        end
+
+        puts self
+      end
 
       def contains?(text)
         search(text, @root, false)
       end
 
-      # def ends_with?(text)
-      #   search(text, @root, true)
-      # end
+      def ends_with?(text)
+        search(text, @root, true)
+      end
 
       private
 
@@ -108,7 +117,7 @@ module ElephantInTheRoom
 
       def rescan
         puts "Rescan"
-        (0...(@remainder - 1)).each do |i|
+        (0...(@remainder)).each do |i|
           letter = @letters[-(@remainder - i)]
           advance_active_point(letter)
         end
@@ -143,18 +152,55 @@ module ElephantInTheRoom
       end
 
       def search(text, node, must_be_suffix)
-        return true if text.empty? && (!must_be_suffix || node.is_a?(EndNode))
+        puts "Search #{text}#{" suffix" if must_be_suffix} starting at node #{node}"
+
+        # If arrived at a node having matched all characters...
+        if text.nil? || text.empty?
+          puts "Matched all text#{" at an end node" if node.is_a?(EndNode)}"
+          # ... return true if it doesn't need to be a suffix, or if at an end node
+          return (!must_be_suffix || node.is_a?(EndNode))
+        end
+
+        # Find the edge to search along
         edge = node.edges[text[0]]
         return false unless edge
+        puts "Search along edge #{edge}"
+
+        # Get the range to search along this edge
         start = edge.start
         to = edge.is_a?(InnerEdge) ? edge.to : @letters.length
-        return false if (to - start) > text.length && must_be_suffix
-        (0...text.length).each do |i|
-          return false if i == to - start && !edge.is_a?(InnerEdge)
-          return search(text[i..], edge.to_node, must_be_suffix) if i == to - start
-          return false if @letters[start + i] != text[i]
+        if must_be_suffix && (to - start) > text.length
+          puts "Edge was too long to match text as a suffix"
+          return false
         end
-        true
+
+        if (to - start) < text.length && !edge.is_a?(InnerEdge)
+          puts "Text was longer than leaf edge"
+          return false
+        end
+
+        (0...[text.length, to - start].min).each do |i|
+          if @letters[start + i] != text[i]
+            puts "Search for #{text[i]} failed finding #{@letters[start + 1]}"
+            return false
+          end
+        end
+
+        next_search_text = text[(to - start)..]
+        unless edge.is_a?(InnerEdge)
+          puts "On a leaf edge so search must conclude"
+          if text.length == (to - start)
+            puts "Matched all text to end of leaf edge"
+            return true
+          end
+          if must_be_suffix
+            puts "Text did not match to end of leaf edge"
+            return false
+          end
+          return true
+        end
+
+        search(next_search_text, edge.to_node, must_be_suffix)
       end
     end
   end

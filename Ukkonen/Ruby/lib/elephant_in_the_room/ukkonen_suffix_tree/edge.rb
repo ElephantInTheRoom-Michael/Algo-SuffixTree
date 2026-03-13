@@ -31,7 +31,7 @@ module ElephantInTheRoom
 
     class InnerEdge < Edge
       attr_reader :to
-      attr_reader :to_node
+      attr_accessor :to_node
 
       def initialize(start, to, to_node, letters)
         super(start, letters)
