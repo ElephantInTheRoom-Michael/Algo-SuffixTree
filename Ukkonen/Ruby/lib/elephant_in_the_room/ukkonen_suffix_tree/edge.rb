@@ -1,54 +1,53 @@
-class Edge
-  attr_reader :start
-  attr_accessor :from_node
+module ElephantInTheRoom
+  module UkkonenSuffixTree
+    class Edge
+      attr_reader :start
+      attr_accessor :from_node
 
-  def initialize(start, letters)
-    @start = start
-    @letters = letters
-  end
+      def initialize(start, letters)
+        @start = start
+        @letters = letters
+      end
 
-  def to_s
-    "#{@letters[start]}@#{start}-\#"
-  end
+      def to_s
+        "#{start}#{@letters[start]}-\#"
+      end
 
-  def split(length)
-    middle = @start + length
-    inner_node = InnerNode.new("#{@from_node.name}(#{@letters[@start]}#{@letters[middle]})", @letters)
-    left_edge = left_split(middle, inner_node)
-    inner_node.from_edge = left_edge
-    @from_node.add_inner_edge(left.start, left.to, inner_node)
-    right_edge = right_split(middle)
-    inner_node.add_edge(right_edge)
-  end
+      def split(length)
+        middle = @start + length
+        inner_node = InnerNode.new("#{@from_node.name}(#{@letters[@start]}#{@letters[middle - 1]})", @letters)
+        left_edge = @from_node.add_inner_edge(@start, middle, inner_node)
+        inner_node.from_edge = left_edge
+        add_edge_to_split_node(inner_node, middle)
+        inner_node
+      end
 
-  private
+      private
 
-  def left_split(middle, inner_node)
-    InnerEdge.new(@start, middle, inner_node, @letters)
-  end
+      def add_edge_to_split_node(inner_node, middle)
+        inner_node.add_edge(middle)
+      end
+    end
 
-  def right_split(middle)
-    Edge.new(middle)
-  end
-end
+    class InnerEdge < Edge
+      attr_reader :to
+      attr_reader :to_node
 
-class InnerEdge < Edge
-  attr_reader :to
-  attr_reader :to_node
+      def initialize(start, to, to_node, letters)
+        super(start, letters)
+        @to = to
+        @to_node = to_node
+      end
 
-  def initialize(start, to, to_node, letters)
-    super(start, letters)
-    @to = to
-    @to_node = to_node
-  end
+      def to_s
+        "#{start}#{@letters[start]}-#{@letters[to - 1]}#{to}"
+      end
 
-  def to_s
-    "#{@letters[start]}@#{start}-#{@letters[to]}@#{to}"
-  end
+      private
 
-  private
-
-  def right_split(middle)
-    InnerEdge.new(middle, @to, @to_node)
+      def add_edge_to_split_node(inner_node, middle)
+        inner_node.add_inner_edge(middle, @to, @to_node)
+      end
+    end
   end
 end

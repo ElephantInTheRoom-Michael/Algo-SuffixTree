@@ -58,7 +58,7 @@ RSpec.describe 'UkkonenSuffixTree' do
       # expect(tree.ends_with?("abca")).to be true
     end
 
-    it 'handles character repetitions' do
+    it 'handles one longer repetition' do
       tree = ElephantInTheRoom::UkkonenSuffixTree.from("abcabx")
       # tree.finalize
       expect(tree.contains?("a")).to be true
@@ -66,6 +66,7 @@ RSpec.describe 'UkkonenSuffixTree' do
       expect(tree.contains?("abc")).to be true
       expect(tree.contains?("abx")).to be true
       expect(tree.contains?("abcx")).to be false
+      expect(tree.contains?("ax")).to be false
       # expect(tree.ends_with?("ab")).to be false
       # expect(tree.ends_with?("abc")).to be false
       # expect(tree.ends_with?("x")).to be true
@@ -74,16 +75,24 @@ RSpec.describe 'UkkonenSuffixTree' do
       # expect(tree.ends_with?("cabx")).to be true
     end
 
+    it 'handles complex repetitions' do
+      tree = ElephantInTheRoom::UkkonenSuffixTree.from("abcabxabcd")
+      expect(tree.contains?("ab")).to be true
+      expect(tree.contains?("abc")).to be true
+      expect(tree.contains?("abx")).to be true
+      expect(tree.contains?("abca")).to be true
+      expect(tree.contains?("abcd")).to be true
+      expect(tree.contains?("abcx")).to be false
+      expect(tree.contains?("abcab")).to be true
+      expect(tree.contains?("abcabx")).to be true
+      expect(tree.contains?("abcabd")).to be false
+    end
+
   #   # Why does this test pass with commented code in finalize ?
   #   it 'can properly finalize finishing on an inner node' do
   #     tree = ElephantInTheRoom::UkkonenSuffixTree.from("abcabxab")
   #     tree.finalize
   #     expect(tree.ends_with?("ab")).to be true
   #   end
-
-    it 'prints' do
-      tree = ElephantInTheRoom::UkkonenSuffixTree.from("abcabxabcd")
-      puts(tree.to_s)
-    end
   end
 end
