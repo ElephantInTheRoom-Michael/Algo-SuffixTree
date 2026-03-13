@@ -85,7 +85,7 @@ module ElephantInTheRoom
 
       def step
         letter = @letters[-1]
-        if @active_edge
+        if @active_length > 0
           unless advance_active_point(letter)
             puts "Split edge #{@active_edge} at length #{@active_length}"
             node = @active_edge.split(@active_length)
@@ -96,8 +96,7 @@ module ElephantInTheRoom
           end
         elsif @active_node.edges.has_key?(letter)
           puts "Found existing edge"
-          @active_edge = @active_node.edges[letter]
-          @active_length = 1
+          advance_active_point(letter)
         else
           puts "Create new edge"
           @active_node.add_edge(@letters.length - 1)
@@ -143,6 +142,7 @@ module ElephantInTheRoom
 
         if @active_edge.is_a?(InnerEdge) && @active_length == @active_edge.to - @active_edge.start
           @active_node = @active_edge.to_node
+          @active_edge = nil
           @active_length = 0
         end
 

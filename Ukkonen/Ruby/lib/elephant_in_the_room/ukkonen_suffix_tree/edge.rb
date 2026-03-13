@@ -15,7 +15,7 @@ module ElephantInTheRoom
 
       def split(length)
         middle = @start + length
-        inner_node = InnerNode.new("#{@from_node.name}(#{@letters[@start]}#{@letters[middle - 1]})", @letters)
+        inner_node = InnerNode.new("#{@from_node.name}(#{@letters[@start]}#{@letters[middle - 1] if (middle - 1) > start})", @letters)
         left_edge = @from_node.add_inner_edge(@start, middle, inner_node)
         inner_node.from_edge = left_edge
         add_edge_to_split_node(inner_node, middle)

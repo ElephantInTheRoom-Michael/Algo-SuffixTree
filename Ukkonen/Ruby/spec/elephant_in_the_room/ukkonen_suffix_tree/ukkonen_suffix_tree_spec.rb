@@ -91,6 +91,16 @@ RSpec.describe 'UkkonenSuffixTree' do
       expect(tree.ends_with?("abc")).to be false
     end
 
+    it 'advances the active point correctly along an edge of length 1' do
+      tree = ElephantInTheRoom::UkkonenSuffixTree.from("abacad")
+      tree.finalize
+      expect(tree.contains?("ab")).to be true
+      expect(tree.contains?("ac")).to be true
+      expect(tree.contains?("ad")).to be true
+      expect(tree.contains?("aba")).to be true
+      expect(tree.contains?("aca")).to be true
+    end
+
     it 'can properly finalize finishing on an inner node' do
       tree = ElephantInTheRoom::UkkonenSuffixTree.from("abcabxab")
       tree.finalize
