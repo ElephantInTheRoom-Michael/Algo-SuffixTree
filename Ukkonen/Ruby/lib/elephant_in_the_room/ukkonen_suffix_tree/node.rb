@@ -1,4 +1,4 @@
-require_relative 'printer'
+require_relative "printer"
 
 module ElephantInTheRoom
   module UkkonenSuffixTree

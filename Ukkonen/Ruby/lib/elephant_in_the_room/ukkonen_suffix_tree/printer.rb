@@ -27,13 +27,13 @@ module ElephantInTheRoom
         lines.each.with_index do |line, line_number|
           prefix = if line_number == 0 && self.is_a?(EndNode)
                      "[]"
-                   elsif line_number == 0
+          elsif line_number == 0
                      "()"
-                   elsif line_number == lines.length - 1
+          elsif line_number == lines.length - 1
                      " \\"
-                   else
+          else
                      " |"
-                   end
+          end
 
           lines[line_number] = "#{prefix}#{line}"
         end
@@ -46,9 +46,9 @@ module ElephantInTheRoom
         first_letter = edge.start
         last_letter = if edge.is_a? InnerEdge
                         edge.to
-                      else
+        else
                         @letters.length
-                      end
+        end
         (first_letter...last_letter).each do |i|
           s += @letters[i]
         end

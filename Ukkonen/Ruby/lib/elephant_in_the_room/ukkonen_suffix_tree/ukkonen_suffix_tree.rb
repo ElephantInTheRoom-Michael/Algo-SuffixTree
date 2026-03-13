@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require_relative 'edge'
-require_relative 'node'
+require_relative "edge"
+require_relative "node"
 
 module ElephantInTheRoom
   module UkkonenSuffixTree
@@ -179,7 +179,7 @@ module ElephantInTheRoom
           return false
         end
 
-        (0...[text.length, to - start].min).each do |i|
+        (0...[ text.length, to - start ].min).each do |i|
           if @letters[start + i] != text[i]
             puts "Search for #{text[i]} failed finding #{@letters[start + 1]}"
             return false
