@@ -9,15 +9,21 @@ module ElephantInTheRoom
       def initialize
         @letters = []
 
-        @root = Node.new
+        @root = Node.new(@letters)
         @active_node = @root
         @active_edge = nil
         @active_length = 0
         @remainder = 0
       end
 
+      def to_s
+        @root.print_tree
+      end
+
       def add(text)
+        puts "Add #{text}"
         text.each_char { add_letter(_1) }
+        puts "Completed building tree for #{@letters.join}"
       end
 
       # def finalize
@@ -44,6 +50,8 @@ module ElephantInTheRoom
       private
 
       def add_letter(letter)
+        puts "Add letter #{letter}"
+
         @letters << letter
 
         @remainder += 1
@@ -51,14 +59,17 @@ module ElephantInTheRoom
       end
 
       def process_remainder
+        puts "Remainder starts at #{@remainder}"
         continue = true
         while @remainder > 0 && continue
           start_letter = @letters[-@remainder]
           continue = step(start_letter)
         end
+        puts "Remainder ends at #{@remainder}"
       end
 
       def step(letter)
+        puts "Step with letter #{letter} at remainder #{@remainder}"
         if @active_edge
           if letter == @letters[@active_edge.start + @active_length]
             @active_length += 1
@@ -69,7 +80,7 @@ module ElephantInTheRoom
           @active_edge = @active_node.edges[letter]
           @active_length = 1
         else
-          @active_node.add_edge(letter, @letters.length - 1)
+          @active_node.add_edge(@letters.length - 1)
           @remainder = 0
         end
 

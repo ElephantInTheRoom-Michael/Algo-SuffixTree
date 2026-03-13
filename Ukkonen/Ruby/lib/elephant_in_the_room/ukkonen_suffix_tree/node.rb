@@ -1,17 +1,73 @@
-class Node
-  attr_reader :edges
+require_relative 'printer'
 
-  def initialize
-    @edges = {}
-  end
+module ElephantInTheRoom
+  module UkkonenSuffixTree
+    class Node
+      include Printer
 
-  def add_edge(letter, start)
-    @edges[letter] = Edge.new(start, self, letter)
-  end
+      attr_reader :edges
 
-  def add_inner_edge(letter, inner_edge)
-    @edges[letter] = inner_edge
+      def initialize(letters)
+        @letters = letters
+
+        @edges = {}
+      end
+
+      def to_s
+        "@@"
+      end
+
+      def add_edge(start)
+        letter = @letters[start]
+        @edges[letter] = Edge.new(start, @letters).tap { _1.from_node = self }
+        puts "Node #{self} added edge #{letter}: #{@edges[letter]}"
+      end
+
+      def add_inner_edge(start, to, to_node)
+        letter = @letters[start]
+        @edges[letter] = InnerEdge.new(start, to, to_node, @letters).tap { _1.from_node = self }
+        puts "Node #{self} added inner edge #{letter} to node #{to_node}: #{@edges[letter]}"
+      end
+
+      def set_all_edges(edges)
+        @edges = edges
+      end
+    end
+
+    class EndNode < Node
+      def initialize(name, letters)
+        super(letters)
+
+        @name = name
+      end
+
+      def to_s
+        "@#{@name}@/"
+      end
+    end
+
+    class InnerNode < Node
+      attr_accessor :from_edge
+
+      def initialize(name, letters)
+        super(letters)
+
+        @name = name
+      end
+
+      def to_s
+        "@#{@name}@"
+      end
+
+      def replace_with_end_node
+        "Node #{self} replaced with end node"
+
+        end_node = EndNode.new(@name, @letters)
+
+        end_node.set_all_edges(@edges)
+
+        @from_edge.to_node = end_node
+      end
+    end
   end
 end
-
-class EndNode < Node; end

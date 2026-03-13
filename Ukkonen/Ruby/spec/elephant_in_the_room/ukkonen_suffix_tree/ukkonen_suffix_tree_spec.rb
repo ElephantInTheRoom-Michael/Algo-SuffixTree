@@ -80,5 +80,10 @@ RSpec.describe 'UkkonenSuffixTree' do
   #     tree.finalize
   #     expect(tree.ends_with?("ab")).to be true
   #   end
+
+    it 'prints' do
+      tree = ElephantInTheRoom::UkkonenSuffixTree.from("abcabxabcd")
+      puts(tree.to_s)
+    end
   end
 end
