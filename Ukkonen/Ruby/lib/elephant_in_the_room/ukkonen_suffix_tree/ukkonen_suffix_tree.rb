@@ -42,8 +42,7 @@ module ElephantInTheRoom
           end
 
           @remainder -= 1
-          reset_active_point
-          rescan if @remainder > 0
+          move_after_insert
         end
 
         puts self
@@ -71,16 +70,41 @@ module ElephantInTheRoom
       def process_remainder
         puts "Remainder starts at #{@remainder}"
         continue = true
+        last_new_node = nil
         while @remainder > 0 && continue
           puts "Remainder #{@remainder}"
-          continue = step
+          continue, new_node = step
           if continue
             @remainder -= 1
-            reset_active_point
-            rescan if @remainder > 0
+          end
+          if !last_new_node.nil? && !new_node.nil?
+            puts "Suffix link from #{last_new_node} to #{new_node}"
+            last_new_node.suffix_link = new_node
+          end
+          last_new_node = new_node
+          unless new_node.nil?
+            move_after_insert
           end
         end
         puts "Remainder ends at #{@remainder}"
+      end
+
+      def move_after_insert
+        if @active_node == @root
+          @active_length -= 1
+          @active_edge = @root.edges[@letters[@letters.length - @remainder]]
+          puts "New node created from root, active edge is now #{@active_edge} with length #{@active_length}"
+        else
+          if @active_node.suffix_link.nil?
+            @active_node = @root
+            @active_edge = @active_node.edges[@letters[@active_edge.start]] if @active_edge
+            puts "Moved active node to root because there was no suffix link"
+          else
+            @active_node = @active_node.suffix_link
+            @active_edge = @active_node.edges[@letters[@active_edge.start]] if @active_edge
+            puts "Followed suffix link to #{@active_node}"
+          end
+        end
       end
 
       def step
@@ -92,7 +116,7 @@ module ElephantInTheRoom
 
             node.add_edge(@letters.length - 1)
 
-            return true
+            return [true, node]
           end
         elsif @active_node.edges.has_key?(letter)
           puts "Found existing edge"
@@ -100,26 +124,11 @@ module ElephantInTheRoom
         else
           puts "Create new edge"
           @active_node.add_edge(@letters.length - 1)
-          return true
+          return [true, nil]
         end
 
         puts "Suffix not completely inserted"
-        false
-      end
-
-      def reset_active_point
-        puts "Reset active point"
-        @active_node = @root
-        @active_edge = nil
-        @active_length = 0
-      end
-
-      def rescan
-        puts "Rescan"
-        (0...(@remainder)).each do |i|
-          letter = @letters[-(@remainder - i)]
-          advance_active_point(letter)
-        end
+        [false, nil]
       end
 
       def advance_active_point(letter)

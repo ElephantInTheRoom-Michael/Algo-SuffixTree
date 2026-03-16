@@ -8,6 +8,8 @@ module ElephantInTheRoom
       attr_reader :name
       attr_reader :edges
 
+      attr_accessor :suffix_link
+
       def initialize(letters)
         @letters = letters
 

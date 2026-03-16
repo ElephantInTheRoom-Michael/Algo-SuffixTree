@@ -37,6 +37,7 @@ module ElephantInTheRoom
 
           lines[line_number] = "#{prefix}#{line}"
         end
+        lines.append(" ...#{@suffix_link.name}") unless @suffix_link.nil?
         lines.join("\n")
       end
 
