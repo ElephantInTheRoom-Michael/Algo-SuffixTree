@@ -10,7 +10,7 @@ module ElephantInTheRoom
       end
 
       def to_s
-        "#{start}#{@letters[start]}-\#"
+        "#{start}#{@letters[start]}^\#"
       end
 
       def split(length)
@@ -40,7 +40,7 @@ module ElephantInTheRoom
       end
 
       def to_s
-        "#{start}#{@letters[start]}-#{@letters[to - 1]}#{to}"
+        "#{start}#{@letters[start]}^#{@letters[to - 1]}#{to}"
       end
 
       private

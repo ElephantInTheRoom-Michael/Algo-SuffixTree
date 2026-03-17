@@ -9,5 +9,9 @@ module ElephantInTheRoom
     def self.from(text)
       UkkonenSuffixTree.new.tap { _1.add(text) }
     end
+
+    def self.empty
+      UkkonenSuffixTree.new
+    end
   end
 end

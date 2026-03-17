@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'rspec'
+require 'logger'
 
 RSpec.describe 'UkkonenSuffixTree' do
   context 'when the text has no repeated characters' do
@@ -110,13 +111,15 @@ RSpec.describe 'UkkonenSuffixTree' do
     end
 
     it 'can properly finalize finishing on an edge' do
-      tree = ElephantInTheRoom::UkkonenSuffixTree.from("abcabcdabc")
+      tree = ElephantInTheRoom::UkkonenSuffixTree.empty
+      tree.logger = Logger.new(STDOUT, level: Logger::Severity::DEBUG)
+      tree.add("abcab")
+      tree.add("abc")
       tree.finalize
       expect(tree.ends_with?("abc")).to be true
-      expect(tree.ends_with?("abcdabc")).to be true
+      expect(tree.ends_with?("ababc")).to be true
       expect(tree.ends_with?("abca")).to be false
-      expect(tree.ends_with?("abcd")).to be false
-      expect(tree.ends_with?("dabc")).to be true
+      expect(tree.ends_with?("babc")).to be true
     end
   end
 end

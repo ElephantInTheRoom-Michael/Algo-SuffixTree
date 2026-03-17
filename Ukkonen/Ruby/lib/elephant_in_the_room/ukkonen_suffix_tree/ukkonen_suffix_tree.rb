@@ -6,6 +6,9 @@ require_relative "node"
 module ElephantInTheRoom
   module UkkonenSuffixTree
     class UkkonenSuffixTree
+      attr_accessor :logger
+      attr_accessor :logger_redact_text
+
       def initialize
         @letters = []
 
@@ -21,23 +24,24 @@ module ElephantInTheRoom
       end
 
       def add(text)
-        puts "Add #{text}"
+        logger&.warn("Add text to tree#{": #{text}" unless @logger_redact_text}")
         text.each_char { add_letter(_1) }
-        puts "Completed building tree for #{@letters.join}"
-        puts self
+        logger&.info { "Tree built for cumulative text#{": #{@letters.join}" unless @logger_redact_text}" }
+        logger&.warn("Tree is not ready for suffix search") if @remainder > 0
       end
 
       def finalize
-        puts "Finalize"
+        logger&.info("Start finalizing tree")
 
         while @remainder > 0
-          puts "Remainder #{@remainder}"
+          logger&.info { "#{@remainder} remaining suffixes to insert at active point #{active_point_to_s}" }
+
           if @active_length > 0
-            puts "On active edge #{@active_edge} at length #{@active_length}"
+            logger&.debug("Split active edge and insert end node")
             inner_node = @active_edge.split(@active_length)
             inner_node.replace_with_end_node
           else
-            puts "On active node #{@active_node}"
+            logger&.debug("Replace active node with end node")
             @active_node.replace_with_end_node
           end
 
@@ -45,7 +49,7 @@ module ElephantInTheRoom
           move_after_insert
         end
 
-        puts self
+        logger&.warn("Tree is ready for suffix search")
       end
 
       def contains?(text)
@@ -58,8 +62,12 @@ module ElephantInTheRoom
 
       private
 
+      def active_point_to_s
+        "#{@active_node}#{"-#{@active_edge}" unless @active_edge.nil?}#{"@#{@active_length}" unless @active_length.zero?}"
+      end
+
       def add_letter(letter)
-        puts "Add letter #{letter}"
+        logger&.debug("Add letter#{": #{letter}" unless @logger_redact_text}")
 
         @letters << letter
 
@@ -68,17 +76,18 @@ module ElephantInTheRoom
       end
 
       def process_remainder
-        puts "Remainder starts at #{@remainder}"
         continue = true
         last_new_node = nil
         while @remainder > 0 && continue
-          puts "Remainder #{@remainder}"
+          logger&.info { "#{@remainder} remaining suffixes to insert at active point #{active_point_to_s}" }
+          logger&.debug { "Try to insert suffix#{": #{@letters[-@remainder..].join}" unless @logger_redact_text}" }
           continue, new_node = step
           if continue
+            logger&.debug("Inserted suffix")
             @remainder -= 1
           end
           if !last_new_node.nil? && !new_node.nil?
-            puts "Suffix link from #{last_new_node} to #{new_node}"
+            logger&.debug("Add suffix link from #{last_new_node} to #{new_node}")
             last_new_node.suffix_link = new_node
           end
           last_new_node = new_node
@@ -86,32 +95,34 @@ module ElephantInTheRoom
             move_after_insert
           end
         end
-        puts "Remainder ends at #{@remainder}"
+        logger&.info { "#{@remainder} remaining suffixes can not be inserted yet" } if @remainder > 0
       end
 
       def move_after_insert
+        logger&.info { "Move active point after node creation, currently at #{active_point_to_s}" }
         if @active_node == @root
           @active_length -= 1
           @active_edge = @root.edges[@letters[@letters.length - @remainder]]
-          puts "New node created from root, active edge is now #{@active_edge} with length #{@active_length}"
+          logger&.debug("Node created from root, stay at root, decrement active length, and update edge")
         else
           if @active_node.suffix_link.nil?
             @active_node = @root
             @active_edge = @active_node.edges[@letters[@active_edge.start]] if @active_edge
-            puts "Moved active node to root because there was no suffix link"
+            logger&.debug("Node created from node with no suffix link, move to root, keep active edge and length the same")
           else
             @active_node = @active_node.suffix_link
             @active_edge = @active_node.edges[@letters[@active_edge.start]] if @active_edge
-            puts "Followed suffix link to #{@active_node}"
+            logger&.debug("Followed suffix link to #{@active_node}, keep active edge and length the same")
           end
         end
+        logger&.info { "Active point moved to #{active_point_to_s}" }
       end
 
       def step
         letter = @letters[-1]
         if @active_length > 0
           unless advance_active_point(letter)
-            puts "Split edge #{@active_edge} at length #{@active_length}"
+            logger&.debug("Split active edge #{@active_edge} at length #{@active_length}")
             node = @active_edge.split(@active_length)
 
             node.add_edge(@letters.length - 1)
@@ -119,30 +130,30 @@ module ElephantInTheRoom
             return [true, node]
           end
         elsif @active_node.edges.has_key?(letter)
-          puts "Found existing edge"
+          logger&.debug("Start following existing edge")
           advance_active_point(letter)
         else
-          puts "Create new edge"
+          logger&.debug("Create new edge")
           @active_node.add_edge(@letters.length - 1)
           return [true, nil]
         end
 
-        puts "Suffix not completely inserted"
+        logger&.debug("Suffix not completely inserted")
         [false, nil]
       end
 
       def advance_active_point(letter)
-        puts "Try to advance active point with letter #{letter}"
+        logger&.info { "Try to advance active point #{active_point_to_s} with letter #{letter}" }
         if @active_length == 0
           @active_edge = @active_node.edges[letter]
           if @active_edge.nil?
-            puts "Can not advance, no edge found"
+            logger&.debug("Can not advance, no edge found")
             return false
           end
         else
           compare_letter = @letters[@active_edge.start + @active_length]
           if letter != compare_letter
-            puts "Can not advance, diverging letter is #{compare_letter}"
+            logger&.debug("Can not advance, diverging letter is #{compare_letter}")
             return false
           end
         end
@@ -150,12 +161,13 @@ module ElephantInTheRoom
         @active_length += 1
 
         if @active_edge.is_a?(InnerEdge) && @active_length == @active_edge.to - @active_edge.start
+          logger&.debug("Reached the end of the edge, advance to the next node")
           @active_node = @active_edge.to_node
           @active_edge = nil
           @active_length = 0
         end
 
-        puts "Advanced active point to #{@active_node} with edge #{@active_edge} and length #{@active_length}"
+        logger&.info { "Advanced active point to #{active_point_to_s}" }
 
         true
       end

@@ -13,12 +13,12 @@ module ElephantInTheRoom
       def initialize(letters)
         @letters = letters
 
-        @name = ""
+        @name = "()"
         @edges = {}
       end
 
       def to_s
-        "@#{@name}@"
+        "#{@name}"
       end
 
       def add_edge(start)
@@ -46,10 +46,6 @@ module ElephantInTheRoom
 
         @name = name
       end
-
-      def to_s
-        "#{super}/"
-      end
     end
 
     class InnerNode < Node
@@ -61,14 +57,10 @@ module ElephantInTheRoom
         @name = name
       end
 
-      def to_s
-        "@#{@name}@"
-      end
-
       def replace_with_end_node
         "Node #{self} replaced with end node"
 
-        end_node = EndNode.new(@name, @letters)
+        end_node = EndNode.new("[#{@name}]", @letters)
 
         end_node.set_all_edges(@edges)
 
