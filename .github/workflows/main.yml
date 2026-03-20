@@ -1,10 +1,9 @@
-name: Ruby
+name: "Ukkonen (Ruby)"
 
 on:
   push:
     branches:
-      - master
-
+      - main
   pull_request:
 
 jobs:
@@ -15,7 +14,9 @@ jobs:
       matrix:
         ruby:
           - '4.0.1'
-
+    defaults:
+      run:
+        working-directory: Ukkonen/Ruby
     steps:
       - uses: actions/checkout@v4
         with:
