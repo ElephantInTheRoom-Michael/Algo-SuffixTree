@@ -18,13 +18,13 @@ jobs:
       run:
         working-directory: Ukkonen/Ruby
     steps:
-      - uses: actions/checkout@v4
-        with:
-          persist-credentials: false
+      - name: Checkout code
+        uses: actions/checkout@v6
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
+          working-directory: Ukkonen/Ruby
       - name: Run the default task
         run: bundle exec rake
