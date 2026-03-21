@@ -2,6 +2,7 @@
 
 require_relative "edge"
 require_relative "node"
+require_relative "active_point"
 
 module ElephantInTheRoom
   module UkkonenSuffixTree
@@ -13,9 +14,7 @@ module ElephantInTheRoom
         @letters = []
 
         @root = Node.new(@letters)
-        @active_node = @root
-        @active_edge = nil
-        @active_length = 0
+        @active_point = ActivePoint.new(@root, @letters)
         @remainder = 0
       end
 
@@ -24,32 +23,32 @@ module ElephantInTheRoom
       end
 
       def add(text)
-        logger&.warn("Add text to tree#{": #{text}" unless @logger_redact_text}")
+        @logger&.warn("Add text to tree#{": #{text}" unless @logger_redact_text}")
         text.each_char { add_letter(_1) }
-        logger&.info { "Tree built for cumulative text#{": #{@letters.join}" unless @logger_redact_text}" }
-        logger&.warn("Tree is not ready for suffix search") if @remainder > 0
+        @logger&.info { "Tree built for cumulative text#{": #{@letters.join}" unless @logger_redact_text}" }
+        @logger&.warn("Tree is not ready for suffix search") if @remainder > 0
       end
 
       def finalize
-        logger&.info("Start finalizing tree")
+        @logger&.info("Start finalizing tree")
 
         while @remainder > 0
-          logger&.info { "#{@remainder} remaining suffixes to insert at active point #{active_point_to_s}" }
+          @logger&.info { "#{@remainder} remaining suffixes to insert at active point #{@active_point}" }
 
-          if @active_length > 0
-            logger&.debug("Split active edge and insert end node")
-            inner_node = @active_edge.split(@active_length)
+          if @active_point.length > 0
+            @logger&.debug("Split active edge and insert end node")
+            inner_node = @active_point.split_active_edge
             inner_node.replace_with_end_node
           else
-            logger&.debug("Replace active node with end node")
-            @active_node.replace_with_end_node
+            @logger&.debug("Replace active node with end node")
+            @active_point.node.replace_with_end_node
           end
 
           @remainder -= 1
-          move_after_insert
+          @active_point.move_after_suffix_inserted
         end
 
-        logger&.warn("Tree is ready for suffix search")
+        @logger&.warn("Tree is ready for suffix search")
       end
 
       def contains?(text)
@@ -62,12 +61,8 @@ module ElephantInTheRoom
 
       private
 
-      def active_point_to_s
-        "#{@active_node}#{"-#{@active_edge}" unless @active_edge.nil?}#{"@#{@active_length}" unless @active_length.zero?}"
-      end
-
       def add_letter(letter)
-        logger&.debug("Add letter#{": #{letter}" unless @logger_redact_text}")
+        @logger&.debug("Add letter#{": #{letter}" unless @logger_redact_text}")
 
         @letters << letter
 
@@ -79,97 +74,43 @@ module ElephantInTheRoom
         continue = true
         last_new_node = nil
         while @remainder > 0 && continue
-          logger&.info { "#{@remainder} remaining suffixes to insert at active point #{active_point_to_s}" }
-          logger&.debug { "Try to insert suffix#{": #{@letters[-@remainder..].join}" unless @logger_redact_text}" }
+          @logger&.info { "#{@remainder} remaining suffixes to insert at active point #{@active_point}" }
+          @logger&.debug { "Try to insert suffix#{": #{@letters[-@remainder..].join}" unless @logger_redact_text}" }
           continue, new_node = step
           if continue
-            logger&.debug("Inserted suffix")
+            @logger&.debug("Inserted suffix")
             @remainder -= 1
+            @active_point.move_after_suffix_inserted
           end
           if !last_new_node.nil? && !new_node.nil?
-            logger&.debug("Add suffix link from #{last_new_node} to #{new_node}")
+            @logger&.debug("Add suffix link from #{last_new_node} to #{new_node}")
             last_new_node.suffix_link = new_node
           end
           last_new_node = new_node
-          unless new_node.nil?
-            move_after_insert
-          end
         end
-        logger&.info { "#{@remainder} remaining suffixes can not be inserted yet" } if @remainder > 0
-      end
-
-      def move_after_insert
-        logger&.info { "Move active point after node creation, currently at #{active_point_to_s}" }
-        if @active_node == @root
-          @active_length -= 1
-          @active_edge = @root.edges[@letters[@letters.length - @remainder]]
-          logger&.debug("Node created from root, stay at root, decrement active length, and update edge")
-        else
-          if @active_node.suffix_link.nil?
-            @active_node = @root
-            @active_edge = @active_node.edges[@letters[@active_edge.start]] if @active_edge
-            logger&.debug("Node created from node with no suffix link, move to root, keep active edge and length the same")
-          else
-            @active_node = @active_node.suffix_link
-            @active_edge = @active_node.edges[@letters[@active_edge.start]] if @active_edge
-            logger&.debug("Followed suffix link to #{@active_node}, keep active edge and length the same")
-          end
-        end
-        logger&.info { "Active point moved to #{active_point_to_s}" }
+        @logger&.info { "#{@remainder} remaining suffixes can not be inserted yet" } if @remainder > 0
       end
 
       def step
         letter = @letters[-1]
-        if @active_length > 0
-          unless advance_active_point(letter)
-            logger&.debug("Split active edge #{@active_edge} at length #{@active_length}")
-            node = @active_edge.split(@active_length)
 
-            node.add_edge(@letters.length - 1)
+        new_node = nil
+        add_edge = false
 
-            return [true, node]
+        unless @active_point.advance_active_point(letter)
+          if @active_point.length == 0
+            @logger&.debug("Create new edge")
+            add_edge = true
+          else
+            @logger&.debug("Split active edge #{@active_edge} at length #{@active_length}")
+            new_node = @active_point.split_active_edge
+            add_edge = true
           end
-        elsif @active_node.edges.has_key?(letter)
-          logger&.debug("Start following existing edge")
-          advance_active_point(letter)
-        else
-          logger&.debug("Create new edge")
-          @active_node.add_edge(@letters.length - 1)
-          return [true, nil]
+          (new_node || @active_point.node).add_edge(@letters.length - 1)
         end
 
-        logger&.debug("Suffix not completely inserted")
-        [false, nil]
-      end
-
-      def advance_active_point(letter)
-        logger&.info { "Try to advance active point #{active_point_to_s} with letter #{letter}" }
-        if @active_length == 0
-          @active_edge = @active_node.edges[letter]
-          if @active_edge.nil?
-            logger&.debug("Can not advance, no edge found")
-            return false
-          end
-        else
-          compare_letter = @letters[@active_edge.start + @active_length]
-          if letter != compare_letter
-            logger&.debug("Can not advance, diverging letter is #{compare_letter}")
-            return false
-          end
-        end
-
-        @active_length += 1
-
-        if @active_edge.is_a?(InnerEdge) && @active_length == @active_edge.to - @active_edge.start
-          logger&.debug("Reached the end of the edge, advance to the next node")
-          @active_node = @active_edge.to_node
-          @active_edge = nil
-          @active_length = 0
-        end
-
-        logger&.info { "Advanced active point to #{active_point_to_s}" }
-
-        true
+        @logger&.debug("Suffix not completely inserted") unless add_edge
+        [ add_edge, new_node ]
       end
 
       def search(text, node, must_be_suffix)
