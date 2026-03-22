@@ -1,0 +1,39 @@
+module ElephantInTheRoom
+  module UkkonenSuffixTree
+    class UkkonenSuffixTree
+      @letters: Enumerable[String]
+
+      @root: Node
+
+      @active_point: ActivePoint
+
+      @remainder: int
+
+      attr_accessor logger: Logger
+
+      attr_accessor logger_redact_text: bool
+
+      def initialize: () -> void
+
+      def to_s: () -> String
+
+      def add: (String text) -> void
+
+      def finalize: () -> void
+
+      def contains?: (String text) -> bool
+
+      def ends_with?: (String text) -> bool
+
+      private
+
+      def add_letter: (String letter) -> void
+
+      def process_remainder: () -> void
+
+      def step: () -> Array[bool | Node]
+
+      def search: (String text, Node node, bool must_be_suffix) -> (bool)
+    end
+  end
+end

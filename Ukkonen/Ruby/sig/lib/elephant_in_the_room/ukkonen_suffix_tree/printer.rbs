@@ -1,13 +1,13 @@
 module ElephantInTheRoom
   module UkkonenSuffixTree
     module Printer
-      def print_tree: () -> untyped
+      def print_tree: () -> String
 
       private
 
-      def print_node: () -> untyped
+      def print_node: () -> String
 
-      def print_edge: (untyped edge) -> untyped
+      def print_edge: (Edge edge) -> String
     end
   end
 end

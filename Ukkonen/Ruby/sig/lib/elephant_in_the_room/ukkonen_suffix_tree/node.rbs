@@ -1,6 +1,8 @@
 module ElephantInTheRoom
   module UkkonenSuffixTree
     class Node
+      include Printer
+
       @letters: Enumerable[String]
 
       @name: String
