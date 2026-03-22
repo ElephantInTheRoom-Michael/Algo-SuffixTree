@@ -1,0 +1,45 @@
+module ElephantInTheRoom
+  module UkkonenSuffixTree
+    class Node
+      @letters: untyped
+
+      @name: untyped
+
+      @edges: untyped
+
+      include Printer
+
+      attr_reader name: untyped
+
+      attr_reader edges: untyped
+
+      attr_accessor suffix_link: untyped
+
+      def initialize: (untyped letters) -> void
+
+      def to_s: () -> ::String
+
+      def add_edge: (untyped start) -> untyped
+
+      def add_inner_edge: (untyped start, untyped to, untyped to_node) -> untyped
+
+      def set_all_edges: (untyped edges) -> untyped
+    end
+
+    class EndNode < Node
+      @name: untyped
+
+      def initialize: (untyped name, untyped letters) -> void
+    end
+
+    class InnerNode < Node
+      @name: untyped
+
+      attr_accessor from_edge: untyped
+
+      def initialize: (untyped name, untyped letters) -> void
+
+      def replace_with_end_node: () -> untyped
+    end
+  end
+end

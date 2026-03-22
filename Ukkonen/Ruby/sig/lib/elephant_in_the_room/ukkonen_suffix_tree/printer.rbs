@@ -1,0 +1,13 @@
+module ElephantInTheRoom
+  module UkkonenSuffixTree
+    module Printer
+      def print_tree: () -> untyped
+
+      private
+
+      def print_node: () -> untyped
+
+      def print_edge: (untyped edge) -> untyped
+    end
+  end
+end
