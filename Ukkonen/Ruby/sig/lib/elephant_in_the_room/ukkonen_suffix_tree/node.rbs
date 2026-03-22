@@ -1,45 +1,39 @@
 module ElephantInTheRoom
   module UkkonenSuffixTree
     class Node
-      @letters: untyped
+      @letters: Enumerable[String]
 
-      @name: untyped
+      @name: String
 
-      @edges: untyped
+      @edges: Hash[String, Edge]
 
-      include Printer
+      attr_reader name: String
 
-      attr_reader name: untyped
+      attr_reader edges: Hash[String, Edge]
 
-      attr_reader edges: untyped
+      attr_accessor suffix_link: Node?
 
-      attr_accessor suffix_link: untyped
-
-      def initialize: (untyped letters) -> void
+      def initialize: (Enumerable[String] letters) -> void
 
       def to_s: () -> ::String
 
-      def add_edge: (untyped start) -> untyped
+      def add_edge: (int start) -> Edge
 
-      def add_inner_edge: (untyped start, untyped to, untyped to_node) -> untyped
+      def add_inner_edge: (int start, int to, Node to_node) -> Edge
 
-      def set_all_edges: (untyped edges) -> untyped
+      def set_all_edges: (Hash[String, Edge] edges) -> void
     end
 
     class EndNode < Node
-      @name: untyped
-
-      def initialize: (untyped name, untyped letters) -> void
+      def initialize: (String name, Enumerable[String] letters) -> void
     end
 
     class InnerNode < Node
-      @name: untyped
+      attr_accessor from_edge: Edge
 
-      attr_accessor from_edge: untyped
+      def initialize: (String name, Enumerable[String] letters) -> void
 
-      def initialize: (untyped name, untyped letters) -> void
-
-      def replace_with_end_node: () -> untyped
+      def replace_with_end_node: () -> void
     end
   end
 end

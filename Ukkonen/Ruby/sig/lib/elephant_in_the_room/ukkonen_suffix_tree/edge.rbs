@@ -1,41 +1,37 @@
 module ElephantInTheRoom
   module UkkonenSuffixTree
     class Edge
-      @start: untyped
+      @start: int
 
-      @letters: untyped
+      @letters: Enumerable[String]
 
-      attr_reader start: untyped
+      attr_reader start: int
 
-      attr_accessor from_node: untyped
+      attr_accessor from_node: Node
 
-      def initialize: (untyped start, untyped letters) -> void
+      def initialize: (int start, Enumerable[String] letters) -> void
 
       def to_s: () -> ::String
 
-      def split: (untyped length) -> untyped
+      def split: (int length) -> Node
 
       private
 
-      def add_edge_to_split_node: (untyped inner_node, untyped middle) -> untyped
+      def add_edge_to_split_node: (Node inner_node, int middle) -> Edge
     end
 
     class InnerEdge < Edge
-      @to: untyped
+      @to: int
 
-      @to_node: untyped
+      @to_node: Node
 
-      attr_reader to: untyped
+      attr_reader to: int
 
-      attr_accessor to_node: untyped
+      attr_accessor to_node: Node
 
-      def initialize: (untyped start, untyped to, untyped to_node, untyped letters) -> void
+      def initialize: (int start, int to, Node to_node, Enumerable[String] letters) -> void
 
       def to_s: () -> ::String
-
-      private
-
-      def add_edge_to_split_node: (untyped inner_node, untyped middle) -> untyped
     end
   end
 end

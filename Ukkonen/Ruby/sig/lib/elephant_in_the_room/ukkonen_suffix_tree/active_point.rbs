@@ -3,7 +3,7 @@ module ElephantInTheRoom
     class ActivePoint
       @root: Node
 
-      @letters: Enumerable[string]
+      @letters: Enumerable[String]
 
       @node: Node
 
@@ -21,7 +21,7 @@ module ElephantInTheRoom
 
       attr_reader length: int
 
-      def initialize: (Node root, Enumerable[string] letters) -> void
+      def initialize: (Node root, Enumerable[String] letters) -> void
 
       def to_s: () -> ::String
 
@@ -29,7 +29,7 @@ module ElephantInTheRoom
 
       def move_after_suffix_inserted: () -> void
 
-      def advance_active_point: (string letter) -> (bool)
+      def advance_active_point: (String letter) -> (bool)
     end
   end
 end
