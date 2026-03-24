@@ -1,15 +1,15 @@
 module ElephantInTheRoom
   module UkkonenSuffixTree
     class ActivePoint
-      @root: Node
-
-      @letters: Enumerable[String]
+      @letters: Array[String]
 
       @node: Node
 
       @edge: Edge?
 
-      @length: int
+      @length: Integer
+
+      @root: Node
 
       attr_accessor logger: ::Logger
 
@@ -19,13 +19,13 @@ module ElephantInTheRoom
 
       attr_reader edge: Edge?
 
-      attr_reader length: int
+      attr_reader length: Integer
 
-      def initialize: (Node root, Enumerable[String] letters) -> void
+      def initialize: (Node root, Array[String] letters) -> void
 
       def to_s: () -> ::String
 
-      def split_active_edge: () -> Node
+      def split_active_edge: () -> InnerNode
 
       def move_after_suffix_inserted: () -> void
 

@@ -10,7 +10,7 @@ module ElephantInTheRoom
       end
 
       def to_s
-        "#{start}#{@letters[start]}^\#"
+        "#{@start}#{@letters[@start]}^\#"
       end
 
       def split(length)

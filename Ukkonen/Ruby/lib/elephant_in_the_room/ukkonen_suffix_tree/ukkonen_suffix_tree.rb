@@ -35,14 +35,15 @@ module ElephantInTheRoom
         while @remainder > 0
           @logger&.info { "#{@remainder} remaining suffixes to insert at active point #{@active_point}" }
 
-          if @active_point.length > 0
+          node_to_replace = if @active_point.length > 0
             @logger&.debug("Split active edge and insert end node")
-            inner_node = @active_point.split_active_edge
-            inner_node.replace_with_end_node
+            @active_point.split_active_edge
           else
             @logger&.debug("Replace active node with end node")
-            @active_point.node.replace_with_end_node
+            @active_point.node
           end
+          raise "Root node must not be replaced with end node" unless node_to_replace.is_a?(InnerNode)
+          node_to_replace.replace_with_end_node
 
           @remainder -= 1
           @active_point.move_after_suffix_inserted
@@ -72,10 +73,10 @@ module ElephantInTheRoom
 
       def process_remainder
         continue = true
-        last_new_node = nil
+        last_new_node = nil # : Node?
         while @remainder > 0 && continue
           @logger&.info { "#{@remainder} remaining suffixes to insert at active point #{@active_point}" }
-          @logger&.debug { "Try to insert suffix#{": #{@letters[-@remainder..].join}" unless @logger_redact_text}" }
+          @logger&.debug { "Try to insert suffix#{": #{@letters[-@remainder..]&.join}" unless @logger_redact_text}" }
           continue, new_node = step
           if continue
             @logger&.debug("Inserted suffix")
@@ -124,7 +125,7 @@ module ElephantInTheRoom
         end
 
         # Find the edge to search along
-        edge = node.edges[text[0]]
+        edge = node.edges[text[0].to_s]
         return false unless edge
         puts "Search along edge #{edge}"
 

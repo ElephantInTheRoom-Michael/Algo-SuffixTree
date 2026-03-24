@@ -8,7 +8,7 @@ module ElephantInTheRoom
       private
 
       def print_node
-        lines = []
+        lines = [] # : Array[String]
 
         @edges.values.each do |edge|
           printed_edge = print_edge(edge)

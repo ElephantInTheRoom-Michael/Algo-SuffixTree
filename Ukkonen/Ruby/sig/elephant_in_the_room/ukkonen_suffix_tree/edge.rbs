@@ -1,0 +1,37 @@
+module ElephantInTheRoom
+  module UkkonenSuffixTree
+    class Edge
+      @start: Integer
+
+      @letters: Array[String]
+
+      attr_reader start: Integer
+
+      attr_accessor from_node: Node
+
+      def initialize: (Integer start, Array[String] letters) -> void
+
+      def to_s: () -> ::String
+
+      def split: (Integer length) -> InnerNode
+
+      private
+
+      def add_edge_to_split_node: (Node inner_node, Integer middle) -> Edge
+    end
+
+    class InnerEdge < Edge
+      @to: Integer
+
+      @to_node: Node
+
+      attr_reader to: Integer
+
+      attr_accessor to_node: Node
+
+      def initialize: (Integer start, Integer to, Node to_node, Array[String] letters) -> void
+
+      def to_s: () -> ::String
+    end
+  end
+end

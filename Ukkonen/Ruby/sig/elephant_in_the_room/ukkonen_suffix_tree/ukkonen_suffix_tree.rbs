@@ -1,13 +1,13 @@
 module ElephantInTheRoom
   module UkkonenSuffixTree
     class UkkonenSuffixTree
-      @letters: Enumerable[String]
+      @letters: Array[String]
 
       @root: Node
 
       @active_point: ActivePoint
 
-      @remainder: int
+      @remainder: Integer
 
       attr_accessor logger: Logger
 
@@ -31,9 +31,9 @@ module ElephantInTheRoom
 
       def process_remainder: () -> void
 
-      def step: () -> Array[bool | Node]
+      def step: () -> [bool, Node?]
 
-      def search: (String text, Node node, bool must_be_suffix) -> (bool)
+      def search: (String? text, Node node, bool must_be_suffix) -> (bool)
     end
   end
 end

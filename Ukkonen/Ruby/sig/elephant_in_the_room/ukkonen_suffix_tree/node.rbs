@@ -3,7 +3,7 @@ module ElephantInTheRoom
     class Node
       include Printer
 
-      @letters: Enumerable[String]
+      @letters: Array[String]
 
       @name: String
 
@@ -15,25 +15,25 @@ module ElephantInTheRoom
 
       attr_accessor suffix_link: Node?
 
-      def initialize: (Enumerable[String] letters) -> void
+      def initialize: (Array[String] letters) -> void
 
       def to_s: () -> ::String
 
-      def add_edge: (int start) -> Edge
+      def add_edge: (Integer start) -> Edge
 
-      def add_inner_edge: (int start, int to, Node to_node) -> Edge
+      def add_inner_edge: (Integer start, Integer to, Node to_node) -> InnerEdge
 
       def set_all_edges: (Hash[String, Edge] edges) -> void
     end
 
     class EndNode < Node
-      def initialize: (String name, Enumerable[String] letters) -> void
+      def initialize: (String name, Array[String] letters) -> void
     end
 
     class InnerNode < Node
-      attr_accessor from_edge: Edge
+      attr_accessor from_edge: InnerEdge
 
-      def initialize: (String name, Enumerable[String] letters) -> void
+      def initialize: (String name, Array[String] letters) -> void
 
       def replace_with_end_node: () -> void
     end

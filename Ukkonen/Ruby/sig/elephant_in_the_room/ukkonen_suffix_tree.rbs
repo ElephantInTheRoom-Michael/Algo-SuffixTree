@@ -1,6 +1,9 @@
 module ElephantInTheRoom
   module UkkonenSuffixTree
     VERSION: String
-    # See the writing guide of rbs: https://github.com/ruby/rbs#guides
+
+    def self.from: (String text) -> UkkonenSuffixTree
+
+    def self.empty: () -> UkkonenSuffixTree
   end
 end

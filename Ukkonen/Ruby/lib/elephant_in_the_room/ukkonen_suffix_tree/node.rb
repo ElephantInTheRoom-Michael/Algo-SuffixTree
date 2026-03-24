@@ -30,9 +30,10 @@ module ElephantInTheRoom
 
       def add_inner_edge(start, to, to_node)
         letter = @letters[start]
-        @edges[letter] = InnerEdge.new(start, to, to_node, @letters).tap { _1.from_node = self }
+        inner_edge = InnerEdge.new(start, to, to_node, @letters).tap { _1.from_node = self }
+        @edges[letter] = inner_edge
         puts "Node #{self} added inner edge #{letter} to node #{to_node}: #{@edges[letter]}"
-        @edges[letter]
+        inner_edge
       end
 
       def set_all_edges(edges)
