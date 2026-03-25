@@ -22,13 +22,14 @@ module ElephantInTheRoom
       end
 
       def split_active_edge
+        @logger&.debug { "Split active edge#{" #{self}" unless logger_redact_text}" }
         edge_to_split = @edge
         raise "No active edge" if edge_to_split.nil?
         edge_to_split.split(@length)
       end
 
       def move_after_suffix_inserted
-        @logger&.info { "Move active point after suffix inserted, currently at #{self}" }
+        @logger&.info { "Move active point#{" #{self}" unless logger_redact_text} after suffix inserted" }
         if @node == @root
           if @length == 0
             @logger&.debug("Last edge inserted at root with no active edge, nothing to do")
@@ -56,11 +57,11 @@ module ElephantInTheRoom
             @edge = @node.edges[@letters[edge.start]]
           end
         end
-        @logger&.info { "Active point moved to #{self}" }
+        @logger&.info { "Active point moved#{" to #{self}" unless logger_redact_text}" }
       end
 
       def advance_active_point(letter)
-        @logger&.info { "Try to advance active point #{self}#{" with letter #{letter}" unless @logger_redact_text}" }
+        @logger&.info { "Try to advance active point#{" #{self}" unless logger_redact_text}#{" with letter #{letter}" unless @logger_redact_text}" }
         initial_edge = @edge
         advanced_edge = @edge
         if initial_edge.nil?
@@ -72,7 +73,7 @@ module ElephantInTheRoom
         else
           compare_letter = @letters[initial_edge.start + @length]
           if letter != compare_letter
-            @logger&.debug("Can not advance#{", diverging letter is #{compare_letter}" unless @logger_redact_text}")
+            @logger&.debug { "Can not advance, diverging letter#{" is #{compare_letter}" unless @logger_redact_text}" }
             return false
           end
         end
@@ -88,7 +89,7 @@ module ElephantInTheRoom
 
         @edge = advanced_edge
 
-        @logger&.info { "Advanced active point to #{self}" }
+        @logger&.info { "Advanced active point#{" to #{self}" unless logger_redact_text}" }
 
         true
       end
