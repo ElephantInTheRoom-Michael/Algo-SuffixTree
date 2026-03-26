@@ -3,21 +3,21 @@ module ElephantInTheRoom
     class Node
       include Printer
 
+      attr_accessor logger: Logger?
+      attr_accessor logger_redact_text: bool
+
       @letters: Array[String]
-
       @name: String
-
       @edges: Hash[String, Edge]
 
       attr_reader name: String
-
       attr_reader edges: Hash[String, Edge]
-
+      attr_writer edges: Hash[String, Edge]
       attr_accessor suffix_link: Node?
 
       def initialize: (Array[String] letters) -> void
 
-      def to_s: () -> ::String
+      def to_s: () -> String
 
       def add_edge: (Integer start) -> Edge
 

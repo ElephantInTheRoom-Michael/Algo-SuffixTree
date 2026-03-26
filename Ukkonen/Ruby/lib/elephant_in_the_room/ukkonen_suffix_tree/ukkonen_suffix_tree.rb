@@ -103,7 +103,6 @@ module ElephantInTheRoom
             @logger&.debug("Create new edge")
             add_edge = true
           else
-            @logger&.debug("Split active edge #{@active_edge} at length #{@active_length}")
             new_node = @active_point.split_active_edge
             add_edge = true
           end
