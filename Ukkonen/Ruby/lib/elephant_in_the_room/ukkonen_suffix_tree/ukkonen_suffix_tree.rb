@@ -23,7 +23,7 @@ module ElephantInTheRoom
       end
 
       def add(text)
-        @logger&.warn("Add text to tree#{": #{text}" unless @logger_redact_text}")
+        @logger&.warn { "Add text to tree#{": #{text}" unless @logger_redact_text}" }
         text.each_char { add_letter(_1) }
         @logger&.info { "Tree built for cumulative text#{": #{@letters.join}" unless @logger_redact_text}" }
         @logger&.warn("Tree is not ready for suffix search") if @remainder > 0
@@ -33,7 +33,7 @@ module ElephantInTheRoom
         @logger&.info("Start finalizing tree")
 
         while @remainder > 0
-          @logger&.info { "#{@remainder} remaining suffixes to insert at active point #{@active_point}" }
+          @logger&.info { "#{@remainder} remaining suffixes to insert#{" at active point #{@active_point}" unless logger_redact_text}" }
 
           node_to_replace = if @active_point.length > 0
             @logger&.debug("Split active edge and insert end node")
@@ -63,7 +63,7 @@ module ElephantInTheRoom
       private
 
       def add_letter(letter)
-        @logger&.debug("Add letter#{": #{letter}" unless @logger_redact_text}")
+        @logger&.debug { "Add letter#{": #{letter}" unless @logger_redact_text}" }
 
         @letters << letter
 
@@ -75,7 +75,7 @@ module ElephantInTheRoom
         continue = true
         last_new_node = nil # : Node?
         while @remainder > 0 && continue
-          @logger&.info { "#{@remainder} remaining suffixes to insert at active point #{@active_point}" }
+          @logger&.info { "#{@remainder} remaining suffixes to insert#{" at active point #{@active_point}" unless logger_redact_text}" }
           @logger&.debug { "Try to insert suffix#{": #{@letters[-@remainder..]&.join}" unless @logger_redact_text}" }
           continue, new_node = step
           if continue
@@ -84,7 +84,7 @@ module ElephantInTheRoom
             @active_point.move_after_suffix_inserted
           end
           if !last_new_node.nil? && !new_node.nil?
-            @logger&.debug("Add suffix link from #{last_new_node} to #{new_node}")
+            @logger&.debug { "Add suffix link#{" from #{last_new_node} to #{new_node}" unless logger_redact_text}" }
             last_new_node.suffix_link = new_node
           end
           last_new_node = new_node
