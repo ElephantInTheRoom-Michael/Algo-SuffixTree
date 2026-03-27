@@ -1,16 +1,14 @@
 module ElephantInTheRoom
   module UkkonenSuffixTree
     class UkkonenSuffixTree
+      include Searcher
+
       @letters: Array[String]
-
       @root: Node
-
       @active_point: ActivePoint
-
       @remainder: Integer
 
-      attr_accessor logger: Logger
-
+      attr_accessor logger: Logger?
       attr_accessor logger_redact_text: bool
 
       def initialize: () -> void
@@ -32,8 +30,6 @@ module ElephantInTheRoom
       def process_remainder: () -> void
 
       def step: () -> [bool, Node?]
-
-      def search: (String? text, Node node, bool must_be_suffix) -> (bool)
     end
   end
 end

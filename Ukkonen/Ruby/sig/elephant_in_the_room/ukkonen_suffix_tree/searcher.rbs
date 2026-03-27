@@ -1,0 +1,10 @@
+module ElephantInTheRoom
+  module UkkonenSuffixTree
+    module Searcher
+      attr_reader logger: Logger?
+      attr_reader logger_redact_text: bool
+
+      def search: (String? text, Node node, bool must_be_suffix) -> (bool)
+    end
+  end
+end
