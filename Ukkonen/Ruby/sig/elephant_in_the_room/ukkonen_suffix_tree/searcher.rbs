@@ -4,7 +4,15 @@ module ElephantInTheRoom
       attr_reader logger: Logger?
       attr_reader logger_redact_text: bool
 
-      def search: (String? text, Node node, bool must_be_suffix) -> (bool)
+      def search: (Array[String] text, Node node, bool must_be_suffix) -> bool
+
+      private
+
+      def check_end_of_search_string: (Array[String] text, Node node, bool must_be_suffix) -> bool?
+
+      def edge_to_search: (Array[String] cs, Node node) -> Edge?
+
+      def edge_length_to_search: (Array[String] cs, Edge edge, bool must_be_suffix) -> Integer?
     end
   end
 end

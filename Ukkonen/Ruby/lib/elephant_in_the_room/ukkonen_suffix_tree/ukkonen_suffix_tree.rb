@@ -56,13 +56,17 @@ module ElephantInTheRoom
       end
 
       def contains?(text)
-        result = search(text, @root, false)
+        logger&.info { "Search#{": #{text}" unless logger_redact_text}" }
+        cs = text.chars
+        result = search(cs, @root, false)
         logger&.warn("Text#{result ? "" : " not"} found in tree#{": #{text}" unless logger_redact_text}")
         result
       end
 
       def ends_with?(text)
-        result = search(text, @root, true)
+        logger&.info { "Search suffix#{": #{text}" unless logger_redact_text}" }
+        cs = text.chars
+        result = search(cs, @root, true)
         logger&.warn("Text suffix#{result ? "" : " not"} found in tree#{": #{text}" unless logger_redact_text}")
         result
       end
